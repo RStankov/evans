@@ -15,17 +15,17 @@ class RepliesController < ApplicationController
   end
 
   def show
-    reply = Reply.find params[:id]
+    reply = find_reply
 
     redirect_to topic_path(reply.topic_id, :page => reply.page_in_topic, :anchor => "reply_#{reply.id}")
   end
 
   def edit
-    @reply = Reply.find params[:id]
+    @reply = find_reply
   end
 
   def update
-    @reply = Reply.find params[:id]
+    @reply = find_reply
 
     if @reply.update_attributes params[:reply]
       redirect_to [@reply.topic, @reply]
@@ -36,7 +36,11 @@ class RepliesController < ApplicationController
 
   private
 
+  def find_reply
+    Reply.find params[:id]
+  end
+
   def authorize
-    deny_access unless can_edit? Reply.find(params[:id])
+    deny_access unless can_edit? find_reply
   end
 end
