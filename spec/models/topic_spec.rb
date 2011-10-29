@@ -109,6 +109,18 @@ describe Topic do
     end
   end
 
+  describe "replying" do
+    let(:topic) { create :topic }
+    let(:user) { create :user }
+
+    it "creates a reply by user" do
+      reply = topic.create_reply(user, :body => 'Message')
+
+      reply.user.should eq user
+      reply.should_not be_new_record
+    end
+  end
+
   it_behaves_like 'Post' do
     let(:post) { Factory(:topic) }
     let(:starred_post) { Factory(:topic, :starred => true) }

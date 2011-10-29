@@ -3,15 +3,14 @@ require 'spec_helper'
 describe RepliesController do
   log_in_as :student
 
-  describe "POST create" do
-    let(:topic) { Factory.stub(:topic) }
-    let(:reply) { Factory.stub(:reply) }
+  let(:reply) { stub_model(Reply) }
+  let(:topic) { stub_model(Topic) }
 
+  describe "POST create" do
     before do
       Topic.stub :find => topic
-      topic.stub_chain :replies, :build => reply
-      reply.stub :user=
-      reply.stub :save
+      topic.stub :create_reply => reply
+      reply.stub :valid? => true
     end
 
     it "requires an authenticated user" do
@@ -25,24 +24,14 @@ describe RepliesController do
       post :create, :topic_id => '42'
     end
 
-    it "builds a reply with params[:reply]" do
-      topic.replies.should_receive(:build).with('reply')
+    it "tries to create a reply with current_user and params[:reply]" do
+      topic.should_receive(:create_reply).with(current_user, 'reply')
       post :create, :topic_id => '42', :reply => 'reply'
-    end
-
-    it "assigns the current user to the reply" do
-      reply.should_receive(:user=).with(current_user)
-      post :create, :topic_id => '42'
-    end
-
-    it "saves the reply" do
-      reply.should_receive(:save)
-      post :create, :topic_id => '42'
     end
 
     context "when successful" do
       it "redirects to the reply" do
-        reply.stub :save => true
+        reply.stub :valid? => true
         post :create, :topic_id => '42'
         response.should redirect_to(topic_reply_path(topic, reply))
       end
@@ -50,7 +39,7 @@ describe RepliesController do
 
     context "when unsuccessful" do
       it "redisplays the form" do
-        reply.stub :save => false
+        reply.stub :valid? => false
         post :create, :topic_id => '42'
         response.should render_template(:new)
       end
@@ -58,8 +47,6 @@ describe RepliesController do
   end
 
   describe "GET edit" do
-    let(:reply) { double }
-
     it "redirects to the page of the topic where the reply is" do
       Reply.stub :find => reply
       reply.stub :topic_id => 10
@@ -73,8 +60,6 @@ describe RepliesController do
   end
 
   describe "GET edit" do
-    let(:reply) { double }
-
     before do
       Reply.stub :find => reply
       controller.stub :can_edit? => true
@@ -94,9 +79,6 @@ describe RepliesController do
   end
 
   describe "PUT update" do
-    let(:reply) { Factory.stub(:reply) }
-    let(:topic) { Factory.stub(:topic) }
-
     before do
       Reply.stub :find => reply
       reply.stub :update_attributes

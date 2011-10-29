@@ -33,6 +33,12 @@ class Topic < Post
     ActiveSupport::TimeZone['UTC'].parse(last_post_at_before_type_cast).in_time_zone
   end
 
+  def create_reply(user, reply_attributes)
+    replies.create(reply_attributes) do |reply|
+      reply.user = user
+    end
+  end
+
   class << self
     def boards_page(page)
       select(<<-END).order('last_post_at DESC').paginate(:page => page, :per_page => per_page)

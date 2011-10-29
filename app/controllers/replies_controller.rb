@@ -4,10 +4,9 @@ class RepliesController < ApplicationController
 
   def create
     @topic = Topic.find params[:topic_id]
-    @reply = @topic.replies.build params[:reply]
-    @reply.user = current_user
+    @reply = @topic.create_reply current_user, params[:reply]
 
-    if @reply.save
+    if @reply.valid?
       redirect_to [@topic, @reply]
     else
       render :new
