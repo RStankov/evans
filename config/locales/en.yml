@@ -64,6 +64,7 @@ en:
         site: Сайт
         about: Разкажете ни за себе си
         comment_notification: Искам да получавам писма за коментари по решенията ми
+        message_board_notification: Искам да получавам писма за коментари по теми в които участвам
       sign_up:
         full_name: Три имена
         faculty_number: Факултетен номер
