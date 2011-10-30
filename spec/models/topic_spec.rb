@@ -66,6 +66,15 @@ describe Topic do
     Topic.new(:title => 'Title').topic_title.should == 'Title'
   end
 
+  it "can give its participants" do
+    topic = create :topic
+    reply = create :reply, :topic => topic
+
+    create :reply, :topic => topic, :user => topic.user
+
+    topic.participants.should =~ [topic.user, reply.user]
+  end
+
   describe "last reply id" do
     let(:topic) { FactoryGirl.create :topic }
 

@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'spork'
- 
+
 Spork.prefork do
   ENV["RAILS_ENV"] ||= "test"
   require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
@@ -8,11 +8,14 @@ Spork.prefork do
   require 'rspec'
 
   require 'cucumber/formatter/unicode' # Remove this line if you don't want Cucumber Unicode support
+  require 'cucumber/rspec/doubles'
   require 'cucumber/rails'
 
   require 'capybara/rails'
   require 'capybara/cucumber'
   require 'capybara/session'
+
+  require 'email_spec/cucumber'
 
   Capybara.default_selector = :css
   Cucumber::Rails::World.use_transactional_fixtures = true

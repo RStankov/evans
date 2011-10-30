@@ -39,6 +39,10 @@ class Topic < Post
     end
   end
 
+  def participants
+    replies.map(&:user).insert(user).uniq
+  end
+
   class << self
     def boards_page(page)
       select(<<-END).order('last_post_at DESC').paginate(:page => page, :per_page => per_page)
