@@ -3,7 +3,7 @@ require 'spec_helper'
 describe RepliesController do
   log_in_as :student
 
-  let(:reply) { stub_model(Reply) }
+  let(:reply) { stub_model(Reply, topic: topic) }
   let(:topic) { stub_model(Topic) }
 
   describe "POST create" do

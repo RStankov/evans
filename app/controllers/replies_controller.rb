@@ -7,7 +7,7 @@ class RepliesController < ApplicationController
     @reply = @topic.create_reply current_user, params[:reply]
 
     if @reply.valid?
-      redirect_to [@topic, @reply]
+      redirect_to reply_path(@reply)
     else
       render :new
     end
@@ -27,7 +27,7 @@ class RepliesController < ApplicationController
     @reply = find_reply
 
     if @reply.update_attributes params[:reply]
-      redirect_to [@reply.topic, @reply]
+      redirect_to reply_path(@reply)
     else
       render :edit
     end

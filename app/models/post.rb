@@ -7,6 +7,10 @@ class Post < ActiveRecord::Base
     user.present? and (user == self.user or user.admin?)
   end
 
+  def author_name
+    user.name
+  end
+
   def star
     self.starred = true
     save!

@@ -11,6 +11,10 @@ shared_examples_for 'Post' do
     raise 'Example groups need to define a method #post that returns the record'
   end
 
+  it "can give its author name" do
+    post.author_name.should eq post.user.name
+  end
+
   it "can be given a star" do
     expect do
       post.star
