@@ -16,7 +16,7 @@ end
 end
 
 Дадено 'че съм отговорил на "$title" с "$reply"' do |title, reply|
-  topic = Topic.find_by_title!(title)
+  topic = Topic.find_by_title(title) || Factory(:topic, :title => title)
   Factory(:reply, :user => @current_user, :topic => topic, :body => reply)
 end
 
@@ -36,6 +36,10 @@ end
   Factory(:reply, :user => user, :topic => topic)
 end
 
+Дадено /^съм съгласен да бъда уведомяван при отговори на теми$/ do
+  @current_user.update_attributes! message_board_notification: true
+end
+
 Когато 'започна да редактирам темата' do
   within 'ol.topic li:first' do
     click_link 'Редактирай'
@@ -46,10 +50,6 @@ end
   within "li:contains('#{reply}')" do
     click_link 'Редактирай'
   end
-end
-
-То 'трябва да няма "$code" в кода на документа' do |code|
-  body.should_not include(code)
 end
 
 Дадено 'отговори към тема "$title":' do |topic_title, table|
@@ -71,13 +71,41 @@ end
   click_button 'Отговори'
 end
 
+Когато 'някой отговори на "$title" с "$reply"' do |topic_title, reply_body|
+  topic = Topic.find_by_title!(topic_title)
+  Factory :reply, topic: topic, body: reply_body
+end
+
+Когато 'отговоря на писмото, което съм получил с "$body"' do |body|
+  recieved_email = ActionMailer::Base.deliveries.last
+  reset_mailer
+
+  mail = Mail.new
+  mail.from    @current_user.email
+  mail.to      recieved_email.reply_to
+  mail.subject "Re: #{recieved_email.subject}"
+  mail.body    body
+
+  TopicMailer.receive_reply(mail)
+end
+
 То '"$name" трябва да получи писмо с "$body"' do |name, body|
   user = User.find_by_full_name!(name)
   mailbox_for(user.email).should_not be_empty
   open_email(user.email, :with_text => body)
 end
 
+То 'трябва да няма "$code" в кода на документа' do |code|
+  body.should_not include(code)
+end
+
 То '"$name" не трябва да получи писмо' do |name|
   user = User.find_by_full_name!(name)
   mailbox_for(user.email).should be_empty
+end
+
+То 'трябва да виждам следните отговори:' do |table|
+  table.rows.flatten.each do |reply_body|
+    page.should have_content(reply_body)
+  end
 end
